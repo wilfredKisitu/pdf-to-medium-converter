@@ -203,6 +203,26 @@ export function detectChapters(pageData, body) {
     chapters.push({ index: 1, title: 'Document Content', lines: all, pageStart: 1 })
   }
 
+  // ── Step 2b: extract section headings for sidebar display ────────────────
+  //
+  // Lines whose font size meets blockParser's h2 (≥1.5×) or h3 (≥1.18×)
+  // thresholds become sidebar sub-items, giving visual hierarchy below the
+  // chapter entry.  We mark `isH2` so the sidebar can use a bolder weight
+  // for top-level section headings vs sub-sections.
+  //
+  for (const ch of chapters) {
+    ch.sections = ch.lines
+      .filter(l =>
+        !l.isImage && !l.isPageBreak &&
+        l.text && l.text.length > 1 && l.text.length < 100 &&
+        (l.fontSize || 0) >= body * 1.18
+      )
+      .map(l => ({
+        text:  l.text,
+        isH2:  l.fontSize >= body * 1.5,
+      }))
+  }
+
   // ── Step 3: inject image pseudo-lines into each chapter ─────────────────
   //
   // pdfProcessor now stores extracted images per page in pageData[].images.
