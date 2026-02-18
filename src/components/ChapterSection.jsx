@@ -1,17 +1,45 @@
 import { useMemo } from 'react'
 import CodeBlock from './CodeBlock.jsx'
+import ImageBlock from './ImageBlock.jsx'
 import { ClockIcon, BookIcon } from './Icons.jsx'
 import { parseBlocks, readTime } from '../lib/blockParser.js'
 import { detectLang } from '../lib/langDetector.js'
 import './ChapterSection.css'
 
-/** Render text with backtick-wrapped inline code segments */
+/**
+ * Render a paragraph, detecting:
+ *  – backtick inline code spans  → <code>
+ *  – inline chapter cross-refs   → <span className="chapter-ref">
+ *  – plain text                  → string
+ */
 function renderInline(text) {
-  return text.split(/(`[^`]+`)/).map((part, i) => {
-    if (part.startsWith('`') && part.endsWith('`')) {
-      return <code key={i} className="inline-code">{part.slice(1, -1)}</code>
+  const tokens = []
+  let lastIdx = 0
+
+  // Single combined regex: capture group 1 = code, group 2+3 = chapter ref
+  const combined = /(`[^`]+`)|((?:Chapter|Section|Part|Appendix)\s+(?:[\dA-Z]+(?:\.[\d]+)*))/gi
+  let m
+  while ((m = combined.exec(text)) !== null) {
+    if (m.index > lastIdx) {
+      tokens.push({ type: 'text', value: text.slice(lastIdx, m.index) })
     }
-    return part
+    if (m[1]) {
+      tokens.push({ type: 'code', value: m[1].slice(1, -1) })
+    } else {
+      tokens.push({ type: 'chapter-ref', value: m[2] })
+    }
+    lastIdx = m.index + m[0].length
+  }
+  if (lastIdx < text.length) {
+    tokens.push({ type: 'text', value: text.slice(lastIdx) })
+  }
+
+  return tokens.map((tok, i) => {
+    if (tok.type === 'code')
+      return <code key={i} className="inline-code">{tok.value}</code>
+    if (tok.type === 'chapter-ref')
+      return <span key={i} className="chapter-ref">{tok.value}</span>
+    return tok.value
   })
 }
 
@@ -39,10 +67,46 @@ export default function ChapterSection({ chapter, index }) {
           if (blk.type === 'p')   return <p key={i}>{renderInline(blk.text)}</p>
           if (blk.type === 'h2')  return <h2 key={i}>{blk.text}</h2>
           if (blk.type === 'h3')  return <h3 key={i}>{blk.text}</h3>
+
           if (blk.type === 'code') {
             const lang = detectLang(blk.lines.join('\n'))
             return <CodeBlock key={i} code={blk.lines.join('\n')} lang={lang} />
           }
+
+          // ── Image extracted from the PDF page ─────────────────────────
+          if (blk.type === 'image') {
+            return (
+              <ImageBlock
+                key={i}
+                src={blk.src}
+                width={blk.width}
+                height={blk.height}
+              />
+            )
+          }
+
+          // ── Section-level mini TOC (chapter's own outline) ────────────
+          // Styled consistently with the main document TOC (same indent
+          // levels, same dot-separated entry / page-number layout) but
+          // rendered inline without the full card wrapper.
+          if (blk.type === 'section-toc') {
+            return (
+              <nav key={i} className="section-toc" aria-label="Section contents">
+                <div className="section-toc-label">Contents</div>
+                <ul className="section-toc-list">
+                  {blk.entries.map((e, j) => (
+                    <li key={j} className={`section-toc-entry section-toc-level-${e.level}`}>
+                      <span className="section-toc-text">{e.text}</span>
+                      {e.page != null && (
+                        <span className="section-toc-page">{e.page}</span>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            )
+          }
+
           return null
         })}
       </div>

@@ -19,6 +19,7 @@ export default function App() {
   const [view,     setView]     = useState('upload')
   const [docName,  setDocName]  = useState('')
   const [chapters, setChapters] = useState([])
+  const [docToc,   setDocToc]   = useState(null)
   const [proc,     setProc]     = useState({ status: '', overall: 0, cards: [] })
 
   /** Update a single chapter card by index */
@@ -53,7 +54,7 @@ export default function App() {
       setProc(p => ({ ...p, status: 'Detecting chapters…' }))
       const allLines  = pageData.flatMap(p => p.lines)
       const body      = medianFontSize(allLines)
-      const detected  = detectChapters(pageData, body)
+      const { chapters: detected, toc } = detectChapters(pageData, body)
 
       setProc(p => ({
         ...p,
@@ -80,6 +81,7 @@ export default function App() {
       setProc(p => ({ ...p, overall: 100, status: 'Rendering article…' }))
       await sleep(400)
       setChapters(detected)
+      setDocToc(toc)
       setView('reader')
 
     } catch (err) {
@@ -92,13 +94,14 @@ export default function App() {
   function goUpload() {
     setView('upload')
     setChapters([])
+    setDocToc(null)
   }
 
   return (
     <AppContext.Provider value={{ theme, toggleTheme, showToast }}>
       {view === 'upload'     && <UploadView     onFile={handleFile} />}
       {view === 'processing' && <ProcessingView data={proc} />}
-      {view === 'reader'     && <ReaderView     docName={docName} chapters={chapters} onNewDoc={goUpload} />}
+      {view === 'reader'     && <ReaderView     docName={docName} chapters={chapters} toc={docToc} onNewDoc={goUpload} />}
       <Toast {...toast} />
     </AppContext.Provider>
   )

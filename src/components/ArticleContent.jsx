@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import ChapterSection from './ChapterSection.jsx'
+import TocSection from './TocSection.jsx'
 import './ArticleContent.css'
 
-export default function ArticleContent({ docName, chapters, onChapterVisible }) {
+export default function ArticleContent({ docName, chapters, toc, onChapterVisible }) {
   // Observe which chapter is in view → drives sidebar active state
   useEffect(() => {
     const sections = document.querySelectorAll('.chapter-sec')
@@ -39,6 +40,9 @@ export default function ArticleContent({ docName, chapters, onChapterVisible }) 
           </div>
         </div>
       </div>
+
+      {/* Table of Contents */}
+      {toc && <TocSection toc={toc} />}
 
       {/* Chapters */}
       {chapters.map((ch, i) => (

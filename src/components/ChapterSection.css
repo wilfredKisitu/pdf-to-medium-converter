@@ -38,7 +38,7 @@
 /* ---- Body text (controlled by reading settings) ---- */
 .ch-body {
   font-family: var(--reading-font);
-  font-size: 20px;
+  font-size: var(--reading-font-size, 20px);
   line-height: var(--reading-line-height);
   letter-spacing: var(--reading-letter-spacing);
   color: var(--text);
@@ -47,7 +47,7 @@
 .ch-body p { margin-bottom: var(--reading-para-spacing); }
 
 .ch-body h2 {
-  font-size: 26px;
+  font-size: calc(var(--reading-font-size, 20px) * 1.3);
   font-weight: 700;
   line-height: 1.28;
   letter-spacing: -0.3px;
@@ -55,7 +55,7 @@
 }
 
 .ch-body h3 {
-  font-size: 21px;
+  font-size: calc(var(--reading-font-size, 20px) * 1.05);
   font-weight: 600;
   line-height: 1.32;
   margin: 36px 0 14px;
@@ -67,6 +67,14 @@
   border-left: 3px solid var(--text-3);
   color: var(--text-2);
   font-style: italic;
+}
+
+/* Inline chapter cross-references ("see Chapter 3", "Section 2.1") */
+.chapter-ref {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
 }
 
 .inline-code {
@@ -81,7 +89,92 @@
 
 [data-theme="dark"] .inline-code { color: #ff79c6; }
 
+/* ── Section-level mini TOC ──────────────────────────────────────────────
+   Visually consistent with TocSection but rendered inline within the
+   chapter body — no card/box, just a compact indented outline.
+   Uses the same font-size tiers and entry/page layout as the main TOC.
+──────────────────────────────────────────────────────────────────────── */
+
+.section-toc {
+  margin: 32px 0 36px;
+  padding: 20px 24px 20px;
+  background: var(--surface);
+  border-left: 3px solid var(--border-2);
+  border-radius: 0 var(--radius) var(--radius) 0;
+}
+
+.section-toc-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 12px;
+}
+
+.section-toc-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* Entry rows — match the indentation and sizing of TocSection */
+.section-toc-entry {
+  display: flex;
+  align-items: baseline;
+  padding: 4px 0;
+  border-bottom: 1px dotted var(--border);
+  font-family: var(--reading-font, var(--font-serif));
+}
+
+.section-toc-entry:last-child { border-bottom: none; }
+
+.section-toc-level-0 {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+  padding-left: 0;
+}
+
+.section-toc-level-1 {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--text-2);
+  padding-left: 16px;
+}
+
+.section-toc-level-2 {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--text-3);
+  padding-left: 32px;
+}
+
+.section-toc-text {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 12px;
+}
+
+.section-toc-page {
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-3);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────── */
+
 @media (max-width: 560px) {
-  .ch-title  { font-size: 24px; }
-  .ch-body   { font-size: 18px; }
+  .ch-title { font-size: 24px; }
+  /* Mobile keeps user's font-size choice but clamps to a readable floor */
+  .ch-body  { font-size: max(16px, var(--reading-font-size, 18px)); }
+
+  .section-toc { padding: 16px 16px 16px; }
+  .section-toc-level-0 { font-size: 13px; }
+  .section-toc-level-1 { font-size: 12px; }
+  .section-toc-level-2 { font-size: 11px; }
 }

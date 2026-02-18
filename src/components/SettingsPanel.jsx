@@ -36,6 +36,7 @@ const FONTS = [
 export const DEFAULT_SETTINGS = {
   font:          'serif',
   twoCol:        false,
+  fontSize:      20,
   lineHeight:    1.78,
   letterSpacing: 0,
   paraSpacing:   26,
@@ -116,6 +117,18 @@ export default function SettingsPanel({ open, settings, onChange, onClose }) {
               Two columns
             </button>
           </div>
+        </section>
+
+        {/* ── Text Size ── */}
+        <section className="sp-section">
+          <div className="sp-section-label">Text Size</div>
+          <Slider
+            label="Font Size"
+            value={settings.fontSize}
+            min={14} max={28} step={1}
+            format={v => `${v}px`}
+            onChange={v => set('fontSize', v)}
+          />
         </section>
 
         {/* ── Spacing ── */}
