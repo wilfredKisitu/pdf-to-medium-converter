@@ -31,6 +31,11 @@ html { scroll-behavior: smooth; font-size: 16px; }
   --font-serif:   charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
   --font-sans:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
   --font-mono:    'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  /* Reading / typography settings (overridden by JS inline styles) */
+  --reading-font:           charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
+  --reading-line-height:    1.78;
+  --reading-letter-spacing: 0em;
+  --reading-para-spacing:   26px;
   --radius:       6px;
   --radius-lg:    14px;
   --dur:          0.2s;

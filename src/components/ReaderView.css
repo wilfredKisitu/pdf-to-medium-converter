@@ -24,8 +24,26 @@
   padding: 72px 28px 120px;
 }
 
+/* ── Two-column layout ── */
+.article-wrap--two-col {
+  max-width: 1140px;
+}
+
+.article-wrap--two-col .article-content {
+  column-count: 2;
+  column-gap: 60px;
+  column-rule: 1px solid var(--border);
+}
+
+.article-wrap--two-col .doc-title,
+.article-wrap--two-col .doc-byline,
+.article-wrap--two-col .ch-divider {
+  column-span: all;
+}
+
 @media (max-width: 860px) {
   .article-main { margin-left: 0; }
+  .article-wrap--two-col .article-content { column-count: 1; }
 }
 
 @media (max-width: 560px) {

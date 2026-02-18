@@ -1,8 +1,15 @@
 import { useApp } from '../contexts/AppContext.jsx'
-import { MenuIcon, DocIcon, SunIcon, MoonIcon } from './Icons.jsx'
+import { MenuIcon, DocIcon, SunIcon, MoonIcon, SettingsIcon } from './Icons.jsx'
 import './ReaderNav.css'
 
-export default function ReaderNav({ docName, progress, onToggleSidebar, onNewDoc }) {
+export default function ReaderNav({
+  docName,
+  progress,
+  onToggleSidebar,
+  onToggleSettings,
+  settingsOpen,
+  onNewDoc,
+}) {
   const { theme, toggleTheme } = useApp()
 
   return (
@@ -18,6 +25,13 @@ export default function ReaderNav({ docName, progress, onToggleSidebar, onNewDoc
         <div className="reader-actions">
           <button className="icon-btn" onClick={onToggleSidebar} title="Toggle chapters">
             <MenuIcon />
+          </button>
+          <button
+            className={`icon-btn${settingsOpen ? ' icon-btn--active' : ''}`}
+            onClick={onToggleSettings}
+            title="Reading settings"
+          >
+            <SettingsIcon />
           </button>
           <button className="icon-btn" onClick={toggleTheme} title="Toggle theme">
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}

@@ -1,8 +1,10 @@
 import * as pdfjsLib from 'pdfjs-dist'
 import { toLines } from './chapterDetector.js'
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js'
+pdfjsLib.GlobalWorkerOptions.workerSrc = new URL(
+  'pdfjs-dist/build/pdf.worker.min.mjs',
+  import.meta.url,
+).href
 
 export async function processPDF(file, onProgress) {
   const buf = await file.arrayBuffer()

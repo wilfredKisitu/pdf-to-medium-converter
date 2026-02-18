@@ -66,8 +66,9 @@
   transition: background var(--dur), transform 0.12s;
 }
 
-.icon-btn:hover { background: var(--surface); transform: scale(1.05); }
-.icon-btn svg   { width: 16px; height: 16px; }
+.icon-btn:hover       { background: var(--surface); transform: scale(1.05); }
+.icon-btn svg         { width: 16px; height: 16px; }
+.icon-btn--active     { background: var(--accent-dim); color: var(--accent); border-color: var(--accent); }
 
 .read-progress {
   position: absolute;

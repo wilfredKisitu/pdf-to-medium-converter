@@ -1,0 +1,292 @@
+/* =============================================
+   SETTINGS PANEL — slide-in drawer
+============================================= */
+
+.sp-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+}
+
+.settings-panel {
+  position: fixed;
+  top: 58px;
+  right: 0;
+  width: 300px;
+  height: calc(100vh - 58px);
+  background: var(--bg);
+  border-left: 1px solid var(--border);
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.settings-panel--open {
+  transform: translateX(0);
+}
+
+/* ── Header ── */
+.sp-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sp-title {
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+}
+
+.sp-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 13px;
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur), color var(--dur);
+}
+
+.sp-close:hover {
+  background: var(--surface);
+  color: var(--text);
+}
+
+/* ── Sections ── */
+.sp-section {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sp-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.9px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  margin-bottom: 14px;
+}
+
+/* ── Font grid ── */
+.sp-font-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+}
+
+.sp-font-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  padding: 10px 2px 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text);
+  transition: border-color var(--dur), background var(--dur);
+}
+
+.sp-font-btn:hover {
+  border-color: var(--border-2);
+  background: var(--surface-2);
+}
+
+.sp-font-btn--active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.sp-font-preview {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.sp-font-name {
+  font-size: 9px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text-2);
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* ── Display toggle ── */
+.sp-toggle-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.sp-col-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 8px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 11px;
+  font-family: inherit;
+  transition: border-color var(--dur), background var(--dur), color var(--dur);
+}
+
+.sp-col-btn:hover {
+  border-color: var(--border-2);
+  color: var(--text);
+}
+
+.sp-col-btn--active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--text);
+}
+
+/* Column icon illustrations */
+.sp-col-icon {
+  width: 42px;
+  height: 30px;
+  border-radius: 3px;
+  border: 1.5px solid currentColor;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.sp-col-icon--1::before {
+  content: '';
+  position: absolute;
+  top: 4px; bottom: 4px; left: 4px; right: 4px;
+  background: currentColor;
+  opacity: 0.22;
+  border-radius: 2px;
+}
+
+.sp-col-icon--2::before,
+.sp-col-icon--2::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  bottom: 4px;
+  width: calc(50% - 6px);
+  background: currentColor;
+  opacity: 0.22;
+  border-radius: 2px;
+}
+
+.sp-col-icon--2::before { left: 4px; }
+.sp-col-icon--2::after  { right: 4px; }
+
+/* ── Sliders ── */
+.sp-slider-row {
+  margin-bottom: 18px;
+}
+
+.sp-slider-row:last-child {
+  margin-bottom: 0;
+}
+
+.sp-slider-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.sp-slider-label {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.sp-slider-val {
+  font-size: 11px;
+  color: var(--text-2);
+  font-variant-numeric: tabular-nums;
+  min-width: 54px;
+  text-align: right;
+}
+
+.sp-range {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 4px;
+  background: var(--border-2);
+  border-radius: 99px;
+  outline: none;
+  cursor: pointer;
+}
+
+.sp-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+  transition: transform 0.12s;
+}
+
+.sp-range::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+}
+
+.sp-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.22);
+}
+
+/* ── Reset button ── */
+.sp-reset {
+  margin: 14px 20px 20px;
+  width: calc(100% - 40px);
+  padding: 9px;
+  background: none;
+  border: 1px solid var(--border-2);
+  border-radius: var(--radius);
+  color: var(--text-2);
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background var(--dur), color var(--dur), border-color var(--dur);
+  flex-shrink: 0;
+}
+
+.sp-reset:hover {
+  background: var(--surface);
+  color: var(--text);
+  border-color: var(--text-3);
+}
+
+/* ── Mobile ── */
+@media (max-width: 560px) {
+  .settings-panel {
+    width: 100%;
+    top: 58px;
+  }
+}

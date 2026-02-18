@@ -35,15 +35,16 @@
   gap: 5px;
 }
 
-/* ---- Body text (Medium-style serif) ---- */
+/* ---- Body text (controlled by reading settings) ---- */
 .ch-body {
-  font-family: var(--font-serif);
+  font-family: var(--reading-font);
   font-size: 20px;
-  line-height: 1.78;
+  line-height: var(--reading-line-height);
+  letter-spacing: var(--reading-letter-spacing);
   color: var(--text);
 }
 
-.ch-body p { margin-bottom: 26px; }
+.ch-body p { margin-bottom: var(--reading-para-spacing); }
 
 .ch-body h2 {
   font-size: 26px;
