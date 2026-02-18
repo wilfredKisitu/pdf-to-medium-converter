@@ -1,7 +1,7 @@
 /* ── Inline image figure ─────────────────────────────────────────────────── */
 
 .img-block {
-  margin: 36px -28px;      /* bleed slightly past text column, matching code blocks */
+  margin: 36px auto;
   cursor: zoom-in;
   border-radius: var(--radius-lg);
   overflow: hidden;
@@ -9,26 +9,15 @@
   box-shadow: var(--shadow);
   background: var(--surface);
   position: relative;
+  /* Width is driven by the img inside (naturalW / max-width:100%) */
+  display: table;   /* shrink-wrap to image width */
+  max-width: 100%;
 }
 
-@media (max-width: 750px) {
-  .img-block { margin: 36px 0; }
-}
-
-/* Aspect-ratio box — keeps layout stable before image loads */
-.img-block-inner {
-  position: relative;
-  width: 100%;
-  height: 0;            /* overridden by inline paddingBottom from JS */
-}
-
-.img-block-inner img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
+/* The actual image — width set inline from naturalW, max-width:100% handles narrow cols */
+.img-block-img {
   display: block;
+  border-radius: var(--radius-lg);
 }
 
 /* Subtle "click to enlarge" hint that appears on hover */

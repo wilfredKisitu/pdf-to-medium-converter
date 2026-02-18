@@ -228,6 +228,8 @@ export function detectChapters(pageData, body) {
             src:      img.src,
             width:    img.width,
             height:   img.height,
+            naturalW: img.naturalW,   // intended CSS display width (PDF pts × 96/72)
+            naturalH: img.naturalH,
             // pdfY is in the same PDF user-space coordinate system as line.y,
             // so the sort below places the image between the right text lines.
             y:        img.pdfY,
@@ -248,6 +250,47 @@ export function detectChapters(pageData, body) {
         })
       }
     }
+  }
+
+  // ── Step 4: inject page-break markers between consecutive pages ──────────
+  //
+  // Between the last line of page N and the first line of page N+1 we insert
+  // a pseudo-line { isPageBreak: true, pageNum: N, footerText }.
+  // footerText is built from pdfProcessor's footerLines for that page.
+  //
+  const footersByPage = new Map()
+  for (const { pageNum, footerLines } of pageData) {
+    if (footerLines && footerLines.length) {
+      const text = footerLines
+        .map(l => l.text.trim())
+        .filter(Boolean)
+        .join('  ')
+      if (text) footersByPage.set(pageNum, text)
+    }
+  }
+
+  for (const ch of chapters) {
+    const merged = []
+    let prevPage = null
+    for (const ln of ch.lines) {
+      const pg = ln.pageNum || null
+      if (prevPage !== null && pg !== null && pg !== prevPage) {
+        // Insert a page-break marker at the transition
+        merged.push({
+          isPageBreak: true,
+          pageNum:     prevPage,
+          footerText:  footersByPage.get(prevPage) || null,
+          text:        '',
+          fontSize:    0,
+          fontName:    '',
+          y:           -Infinity,
+          body,
+        })
+      }
+      merged.push(ln)
+      if (pg !== null) prevPage = pg
+    }
+    ch.lines = merged
   }
 
   return { chapters, toc }

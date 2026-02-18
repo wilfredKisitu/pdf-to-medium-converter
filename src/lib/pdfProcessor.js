@@ -15,8 +15,13 @@ const OP_IMAGE     = 85   // paintImageXObject
 const OP_IMAGE_RPT = 88   // paintImageXObjectRepeat
 const OP_INLINE    = 91   // paintInlineImageXObject
 
-/** Canvas render scale for image extraction (1.5 = 150 % resolution). */
-const IMAGE_SCALE = 1.5
+/**
+ * Canvas render scale for image extraction.
+ * 3× gives a 2160-px-wide canvas for a letter page, ensuring extracted
+ * images are always higher resolution than the display container and
+ * are shown at their natural size (no CSS upscaling → no blur).
+ */
+const IMAGE_SCALE = 3
 
 /** Minimum image dimension in canvas pixels to avoid icons / decorations. */
 const MIN_PX = 30
@@ -142,11 +147,17 @@ async function extractImages(page, pageW, pageH) {
     ic.getContext('2d').drawImage(cvs, x0, y0, ic.width, ic.height, 0, 0, ic.width, ic.height)
 
     images.push({
-      src:    ic.toDataURL('image/png'),
-      width:  ic.width,
-      height: ic.height,
+      src:      ic.toDataURL('image/png'),
+      // Pixel dimensions of the extracted canvas crop
+      width:    ic.width,
+      height:   ic.height,
+      // Natural display width in CSS px: PDF units × (96 / 72) screen dpi factor
+      // divided by the extraction scale → restores the 1× size the PDF intends.
+      // This lets ImageBlock display images at 1:1 CSS pixels, no CSS upscaling.
+      naturalW: Math.round((r.maxX - r.minX) * (96 / 72)),
+      naturalH: Math.round((r.maxY - r.minY) * (96 / 72)),
       // Midpoint Y in PDF user space — same coordinate system as line.y from toLines()
-      pdfY:   (r.minY + r.maxY) / 2,
+      pdfY:     (r.minY + r.maxY) / 2,
     })
   }
 
@@ -154,6 +165,42 @@ async function extractImages(page, pageW, pageH) {
 }
 
 // ── Main export ───────────────────────────────────────────────────────────
+
+/**
+ * Separate footer lines from body lines on a page.
+ *
+ * Footer heuristic:
+ *  - Lines whose Y coordinate falls in the bottom FOOTER_ZONE fraction of the
+ *    page are candidates.
+ *  - We also capture a thin header zone at the top (running heads).
+ *
+ * Returns { bodyLines, footerLines, headerLines } — each an array of line objects
+ * (same shape as toLines() output).
+ *
+ * @param {object[]} lines  – toLines() output (already sorted top-to-bottom)
+ * @param {number}   pageH  – page height in PDF units
+ */
+function splitPageZones(lines, pageH) {
+  const FOOTER_ZONE = 0.10   // bottom 10 % of page height
+  const HEADER_ZONE = 0.06   // top    6 %
+  const footerY     = pageH * FOOTER_ZONE
+  const headerY     = pageH * (1 - HEADER_ZONE)
+
+  const bodyLines   = []
+  const footerLines = []
+  const headerLines = []
+
+  for (const ln of lines) {
+    if (ln.y <= footerY) {
+      footerLines.push(ln)
+    } else if (ln.y >= headerY) {
+      headerLines.push(ln)
+    } else {
+      bodyLines.push(ln)
+    }
+  }
+  return { bodyLines, footerLines, headerLines }
+}
 
 export async function processPDF(file, onProgress) {
   const buf = await file.arrayBuffer()
@@ -168,9 +215,13 @@ export async function processPDF(file, onProgress) {
     const vp      = pg.getViewport({ scale: 1 })
     // Extract images alongside text; errors are caught internally and return []
     const images  = await extractImages(pg, vp.width, vp.height)
+    const allLines = toLines(content.items)
+    const { bodyLines, footerLines, headerLines } = splitPageZones(allLines, vp.height)
     pageData.push({
       pageNum: p,
-      lines:   toLines(content.items),
+      lines:   bodyLines,
+      footerLines,
+      headerLines,
       images,
       w:       vp.width,
       h:       vp.height,

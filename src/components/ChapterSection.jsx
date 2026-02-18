@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import CodeBlock from './CodeBlock.jsx'
 import ImageBlock from './ImageBlock.jsx'
+import PageBreak from './PageBreak.jsx'
 import { ClockIcon, BookIcon } from './Icons.jsx'
 import { parseBlocks, readTime } from '../lib/blockParser.js'
 import { detectLang } from '../lib/langDetector.js'
@@ -81,6 +82,8 @@ export default function ChapterSection({ chapter, index }) {
                 src={blk.src}
                 width={blk.width}
                 height={blk.height}
+                naturalW={blk.naturalW}
+                naturalH={blk.naturalH}
               />
             )
           }
@@ -104,6 +107,38 @@ export default function ChapterSection({ chapter, index }) {
                   ))}
                 </ul>
               </nav>
+            )
+          }
+
+          // ── Page separator with footer text ───────────────────────────
+          if (blk.type === 'page-break') {
+            return (
+              <PageBreak
+                key={i}
+                pageNum={blk.pageNum}
+                footerText={blk.footerText}
+              />
+            )
+          }
+
+          // ── Display equation ──────────────────────────────────────────
+          if (blk.type === 'equation') {
+            return (
+              <div key={i} className="eq-block">
+                <span className="eq-expr">{blk.text}</span>
+                {blk.label && <span className="eq-label">{blk.label}</span>}
+              </div>
+            )
+          }
+
+          // ── Bibliography / references ─────────────────────────────────
+          if (blk.type === 'references') {
+            return (
+              <ol key={i} className="ref-list">
+                {blk.entries.map((entry, j) => (
+                  <li key={j} className="ref-entry">{renderInline(entry)}</li>
+                ))}
+              </ol>
             )
           }
 

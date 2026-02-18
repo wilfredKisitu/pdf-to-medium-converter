@@ -39,6 +39,64 @@ function depthDelta(text) {
   return delta
 }
 
+// ── Equation detection ─────────────────────────────────────────────────────
+
+/**
+ * True when a short line looks like a display equation or formula.
+ * Signals:
+ *  - Contains a significant density of Greek/math Unicode characters
+ *  - Looks like a LaTeX-style expression (integral, sigma, nabla, etc.)
+ *  - Ends with an equation label like (1) or [eq. 2]
+ */
+const MATH_CHARS = /[∫∑∏√∂∇∆∞±×÷≈≠≤≥∈∉⊂⊃∪∩→←↔⇒⇔∧∨¬αβγδεζηθικλμνξπρστυφχψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΠΡΣΤΥΦΧΨΩ]/
+
+function looksEquation(t, fs, body) {
+  const s = t.trim()
+  if (!s || s.length > 200) return false
+
+  // Must have at least some math-like content
+  const mathDensity = (s.match(MATH_CHARS) || []).length / s.length
+  if (mathDensity < 0.08 && !/[=<>]/.test(s)) return false
+
+  // Optionally: isolated / short centered lines in a larger font
+  const isShort    = s.length < 80
+  const hasMath    = mathDensity >= 0.05 || /[∫∑∏√∂∇]/.test(s)
+  const hasEqLabel = /\(\s*\d+\s*\)\s*$/.test(s) || /\[\s*(?:eq\.?\s*)?\d+\s*\]\s*$/i.test(s)
+
+  return isShort && (hasMath || hasEqLabel)
+}
+
+/**
+ * Extract an optional equation label like "(3)" or "[eq. 5]" from the end
+ * of the line. Returns { expr, label } where label may be null.
+ */
+function splitEqLabel(t) {
+  const s = t.trim()
+  const m = s.match(/^(.*?)\s*(\(\s*\d+\s*\)|\[\s*(?:eq\.?\s*)?\d+\s*\])\s*$/i)
+  if (m) return { expr: m[1].trim(), label: m[2].trim() }
+  return { expr: s, label: null }
+}
+
+// ── Reference entry detection ──────────────────────────────────────────────
+
+/**
+ * True when a line looks like a bibliographic reference entry.
+ * Patterns:
+ *  [1] Author, Title...
+ *  1. Author, Title...
+ *  Author, A. (2023). Title...
+ *  Lines containing a DOI: https://doi.org/...
+ */
+function looksReference(t) {
+  const s = t.trim()
+  return (
+    /^\[\d+\]/.test(s) ||
+    /^\d{1,3}\.\s+[A-Z]/.test(s) ||
+    /https?:\/\/doi\.org\//i.test(s) ||
+    /\bdoi\s*:\s*10\.\d{4,}/i.test(s)
+  )
+}
+
 // ── Section-level TOC detection ────────────────────────────────────────────
 
 /**
@@ -82,6 +140,7 @@ export function parseBlocks(lines) {
   const blocks = []
   let para      = []
   let tocBuf    = []   // candidate section-TOC lines
+  let refBuf    = []   // candidate bibliography reference lines
   let code      = []
   let codeDepth = 0    // net open-delimiter depth across current code block
   let lastY     = null
@@ -89,6 +148,17 @@ export function parseBlocks(lines) {
   let lastFs    = null
 
   // ── flush helpers ────────────────────────────────────────────────────────
+
+  /**
+   * Flush the reference buffer.
+   * ≥ 1 consecutive reference-like lines → emit a `references` block.
+   */
+  function flushRefBuf() {
+    if (refBuf.length) {
+      blocks.push({ type: 'references', entries: [...refBuf] })
+      refBuf = []
+    }
+  }
 
   /**
    * Flush the section-TOC buffer.
@@ -105,6 +175,7 @@ export function parseBlocks(lines) {
   }
 
   function flushPara() {
+    flushRefBuf()
     flushTocBuf()
     // joinProseLines detects word-break hyphens and rejoins split words.
     // normalizeProse fixes punctuation sequences (-- → –, --- → —, etc.)
@@ -127,10 +198,31 @@ export function parseBlocks(lines) {
 
   for (const ln of lines) {
 
+    // ── Page-break markers (injected by chapterDetector) ─────────────────
+    if (ln.isPageBreak) {
+      breakBlock()
+      blocks.push({
+        type:       'page-break',
+        pageNum:    ln.pageNum,
+        footerText: ln.footerText || null,
+      })
+      lastY    = null
+      lastPage = ln.pageNum
+      lastFs   = null
+      continue
+    }
+
     // ── Image pseudo-lines (injected by chapterDetector) ──────────────────
     if (ln.isImage) {
       breakBlock()
-      blocks.push({ type: 'image', src: ln.src, width: ln.width, height: ln.height })
+      blocks.push({
+        type:     'image',
+        src:      ln.src,
+        width:    ln.width,
+        height:   ln.height,
+        naturalW: ln.naturalW,
+        naturalH: ln.naturalH,
+      })
       lastY    = ln.y
       lastPage = ln.pageNum
       lastFs   = null
@@ -186,6 +278,7 @@ export function parseBlocks(lines) {
       if (isCode) {
         // Entering or continuing a code block — flush any pending TOC/prose
         if (tocBuf.length) flushTocBuf()
+        if (refBuf.length) flushRefBuf()
         if (para.length)   flushPara()
         codeDepth = Math.max(0, codeDepth + depthDelta(t))
         code.push(t)
@@ -196,6 +289,12 @@ export function parseBlocks(lines) {
         codeDepth = Math.max(0, codeDepth + depthDelta(t))
         code.push(t)
 
+      } else if (looksEquation(t, fs, body)) {
+        // Standalone display equation — emit as its own block
+        flushCode(); flushPara()
+        const { expr, label } = splitEqLabel(t)
+        blocks.push({ type: 'equation', text: expr, label })
+
       } else {
         // Plain prose — close any open code block first
         if (code.length >= 2)       { flushCode() }
@@ -204,13 +303,20 @@ export function parseBlocks(lines) {
           code = []; codeDepth = 0
         }
 
+        if (looksReference(t)) {
+          // Bibliography / reference entry — accumulate consecutive entries
+          if (para.length)   flushPara()
+          if (tocBuf.length) flushTocBuf()
+          refBuf.push(t)
         // Section-TOC accumulation: if this line looks like a dot-leader entry,
         // buffer it; otherwise flush the buffer and add to prose.
-        if (isTocLike(t)) {
-          if (para.length) flushPara()   // finish any preceding prose first
+        } else if (isTocLike(t)) {
+          if (para.length)   flushPara()   // finish any preceding prose first
+          if (refBuf.length) flushRefBuf()
           tocBuf.push(t)
         } else {
           if (tocBuf.length) flushTocBuf()
+          if (refBuf.length) flushRefBuf()
           para.push(t)
         }
       }
