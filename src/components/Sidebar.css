@@ -1,0 +1,79 @@
+.sidebar {
+  position: fixed;
+  top: 58px;
+  left: 0;
+  bottom: 0;
+  width: 268px;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 22px 0;
+  transition: transform var(--dur);
+  z-index: 80;
+}
+
+.sidebar--hidden {
+  transform: translateX(-100%);
+}
+
+.sidebar-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-3);
+  padding: 0 22px 14px;
+}
+
+.sb-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 22px;
+  cursor: pointer;
+  border-left: 3px solid transparent;
+  text-decoration: none;
+  color: var(--text);
+  transition: background var(--dur), border-color var(--dur), color var(--dur);
+}
+
+.sb-item:hover { background: var(--border); }
+
+.sb-item--active {
+  border-left-color: var(--accent);
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.sb-num {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-3);
+  min-width: 22px;
+  padding-top: 2px;
+  flex-shrink: 0;
+}
+
+.sb-text {
+  font-size: 13px;
+  line-height: 1.45;
+  flex: 1;
+}
+
+/* The check icon — shown only when chapter is done */
+.sb-item svg {
+  margin-left: auto;
+  margin-top: 2px;
+  color: var(--accent);
+  opacity: 0;
+  transition: opacity var(--dur);
+  flex-shrink: 0;
+}
+
+.sb-item--done svg {
+  opacity: 1;
+}
+
+@media (max-width: 860px) {
+  .sidebar { display: none !important; }
+}

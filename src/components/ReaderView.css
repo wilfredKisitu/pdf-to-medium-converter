@@ -1,0 +1,33 @@
+.reader-view {
+  min-height: 100vh;
+}
+
+.reader-body {
+  display: flex;
+  padding-top: 58px;
+  min-height: 100vh;
+}
+
+.article-main {
+  flex: 1;
+  margin-left: 268px;
+  transition: margin-left var(--dur);
+}
+
+.article-main--expanded {
+  margin-left: 0;
+}
+
+.article-wrap {
+  max-width: 694px;
+  margin: 0 auto;
+  padding: 72px 28px 120px;
+}
+
+@media (max-width: 860px) {
+  .article-main { margin-left: 0; }
+}
+
+@media (max-width: 560px) {
+  .article-wrap { padding: 48px 20px 80px; }
+}

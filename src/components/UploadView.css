@@ -1,0 +1,144 @@
+.upload-view {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 48px 24px;
+}
+
+/* Theme toggle */
+.g-theme-btn {
+  position: fixed;
+  top: 18px;
+  right: 18px;
+  z-index: 999;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur), transform 0.15s;
+  box-shadow: var(--shadow-sm);
+  color: var(--text);
+}
+
+.g-theme-btn:hover { transform: scale(1.07); }
+.g-theme-btn svg   { width: 19px; height: 19px; }
+
+/* Brand */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 56px;
+}
+
+.brand-mark {
+  width: 40px;
+  height: 40px;
+  background: var(--text);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background var(--dur);
+  color: var(--bg);
+}
+
+.brand-mark svg { width: 20px; height: 20px; transition: fill var(--dur), stroke var(--dur); }
+.brand-name { font-size: 20px; font-weight: 700; letter-spacing: -0.4px; }
+
+/* Hero */
+.upload-hero {
+  text-align: center;
+  margin-bottom: 44px;
+}
+
+.upload-hero h1 {
+  font-family: var(--font-serif);
+  font-size: clamp(30px, 5.5vw, 54px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  margin-bottom: 18px;
+}
+
+.upload-hero p {
+  font-size: 18px;
+  color: var(--text-2);
+  max-width: 460px;
+  line-height: 1.65;
+  margin: 0 auto;
+}
+
+/* Drop zone */
+.drop-zone {
+  position: relative;
+  width: 100%;
+  max-width: 540px;
+  border: 2px dashed var(--border-2);
+  border-radius: var(--radius-lg);
+  padding: 64px 40px;
+  text-align: center;
+  cursor: pointer;
+  transition: border-color var(--dur), background var(--dur);
+}
+
+.drop-zone:hover,
+.drop-zone--over {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.drop-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 20px;
+  color: var(--text-3);
+}
+
+.drop-icon svg { width: 100%; height: 100%; }
+
+.drop-zone h3 { font-size: 17px; font-weight: 600; margin-bottom: 7px; }
+.drop-zone p  { font-size: 14px; color: var(--text-2); }
+
+.drop-cta {
+  display: inline-block;
+  margin-top: 22px;
+  padding: 11px 28px;
+  background: var(--text);
+  color: var(--bg);
+  border-radius: 99px;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+  transition: background var(--dur), color var(--dur);
+}
+
+/* Feature pills */
+.feature-pills {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 44px;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 99px;
+  font-size: 13px;
+  color: var(--text-2);
+  background: var(--surface);
+}
+
+.pill svg { color: var(--accent); }

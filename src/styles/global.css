@@ -1,0 +1,88 @@
+/* =============================================
+   RESET
+============================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; font-size: 16px; }
+
+/* =============================================
+   THEME VARIABLES
+============================================= */
+:root {
+  --bg:           #ffffff;
+  --surface:      #f9f9f9;
+  --surface-2:    #f0f0f0;
+  --text:         #292929;
+  --text-2:       #6b6b6b;
+  --text-3:       #b3b3b3;
+  --border:       #e8e8e8;
+  --border-2:     #d0d0d0;
+  --accent:       #1a8917;
+  --accent-dim:   rgba(26, 137, 23, 0.08);
+  --code-bg:      #f6f8fa;
+  --code-border:  #e1e4e8;
+  --nav-bg:       rgba(255, 255, 255, 0.93);
+  --shadow-sm:    0 1px 4px rgba(0, 0, 0, 0.06);
+  --shadow:       0 2px 12px rgba(0, 0, 0, 0.09);
+  --shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.13);
+  --hl-yellow:    rgba(255, 222, 0, 0.45);
+  --hl-blue:      rgba(0, 136, 255, 0.22);
+  --hl-green:     rgba(0, 200, 100, 0.28);
+  --hl-pink:      rgba(255, 40, 110, 0.22);
+  --font-serif:   charter, 'Bitstream Charter', 'Sitka Text', Cambria, Georgia, serif;
+  --font-sans:    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, sans-serif;
+  --font-mono:    'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  --radius:       6px;
+  --radius-lg:    14px;
+  --dur:          0.2s;
+}
+
+[data-theme="dark"] {
+  --bg:           #191919;
+  --surface:      #242424;
+  --surface-2:    #2e2e2e;
+  --text:         #e6e6e6;
+  --text-2:       #9a9a9a;
+  --text-3:       #555;
+  --border:       #333;
+  --border-2:     #444;
+  --accent:       #3ec926;
+  --accent-dim:   rgba(62, 201, 38, 0.07);
+  --code-bg:      #1e1e1e;
+  --code-border:  #383838;
+  --nav-bg:       rgba(25, 25, 25, 0.93);
+  --shadow-sm:    0 1px 4px rgba(0, 0, 0, 0.3);
+  --shadow:       0 2px 12px rgba(0, 0, 0, 0.35);
+  --shadow-lg:    0 8px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* =============================================
+   BASE
+============================================= */
+body {
+  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--text);
+  transition: background var(--dur), color var(--dur);
+  min-height: 100vh;
+}
+
+/* =============================================
+   SCROLLBAR
+============================================= */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 99px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* =============================================
+   SELECTION
+============================================= */
+::selection { background: rgba(26, 137, 23, 0.18); }
+
+/* =============================================
+   HIGHLIGHT MARKS (used across the article)
+============================================= */
+mark.hl-y { background: var(--hl-yellow); border-radius: 2px; color: inherit; }
+mark.hl-b { background: var(--hl-blue);   border-radius: 2px; color: inherit; }
+mark.hl-g { background: var(--hl-green);  border-radius: 2px; color: inherit; }
+mark.hl-p { background: var(--hl-pink);   border-radius: 2px; color: inherit; }

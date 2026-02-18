@@ -1,0 +1,55 @@
+.hl-toolbar {
+  position: fixed;
+  z-index: 500;
+  background: #1a1a1a;
+  border-radius: 9px;
+  padding: 7px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: var(--shadow-lg);
+  user-select: none;
+}
+
+[data-theme="dark"] .hl-toolbar {
+  background: #333;
+}
+
+.hl-swatch {
+  width: 22px;
+  height: 22px;
+  border-radius: 5px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  cursor: pointer;
+  transition: transform 0.12s, border-color 0.12s;
+}
+
+.hl-swatch:hover {
+  transform: scale(1.18);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.hl-sep {
+  width: 1px;
+  height: 18px;
+  background: rgba(255, 255, 255, 0.18);
+  margin: 0 3px;
+}
+
+.hl-act {
+  width: 27px;
+  height: 27px;
+  border-radius: 5px;
+  border: none;
+  background: transparent;
+  color: #fff;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.12s;
+}
+
+.hl-act:hover {
+  background: rgba(255, 255, 255, 0.18);
+}
